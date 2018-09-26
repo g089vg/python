@@ -21,3 +21,21 @@ Add Environment variable
     
 ・Chainer 4.1  
     pip install chainer  
+
+
+Using Github  
+git add "FILE NAME"  
+git commit -m "first commit"  
+git push origin master  
+
+if  show [rejected]→git pull  
+
+Creat SSH Key  
+cd ~/.ssh  
+ssh-keygen -t rsa -C "Your mail address"   
+ls -l  
+less id_rsa.pub  
+
+
+
+
