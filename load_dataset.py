@@ -9,13 +9,18 @@ from PIL import Image
 import numpy as np
 import glob
 import os
-import random
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-import pickle
-def Load_Dataset(Folder_Name, mode,channels):
+from random import random
+def Load_Dataset(Folder_Name, mode,channels, num):
 
+    
+
+    
+    
     allData = []
+    select_rate = 0
+
     file_list = os.listdir(Folder_Name) 
     for file_name in file_list:
         root, ext = os.path.splitext(file_name)
@@ -39,12 +44,25 @@ def Load_Dataset(Folder_Name, mode,channels):
                 for imgName in imagelist:
                     allData.append([imgName, label])
             
-    allData = random.sample(allData, len(allData))
-    number = len(allData)   
-    number = float(number)
+    allData = np.random.permutation(allData)
+
+    number = len(allData)  
     print("number",number)
     load_num = 0
     load_rate = 0.0
+
+
+    if channels == 0:
+        print("Load numpy Data")
+        imageData = np.load('./np_data/image_'+Folder_Name+mode+'.npy')
+        labelData = np.load('./np_data/label_'+Folder_Name+mode+'.npy')
+        train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
+        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
+        print(len(imageData))
+        threshold = len(imageData) -100 
+        return train,test   
+
+
 
     if channels == 1: #チャンネル数が1つの場合
         imageData = []
@@ -60,17 +78,15 @@ def Load_Dataset(Folder_Name, mode,channels):
             imgData = np.asarray([grayImgData])
             imageData.append(imgData)
             labelData.append(np.int32(pathAndLabel[1]))
-        f_image = open('image.txt', 'w')         
-        list = imageData
-        pickle.dump(list, f_image)
-        f_label = open('label.txt', 'w')
-        list = labelData
-        pickle.dump(list, f_label)            
-        threshold = np.int32(len(imageData)/8*7)
+
+            
+        threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
-        print("train={0}".format(threshold))
-        print("test={0}".format(number-threshold))
+        np.save('./np_data/image_'+Folder_Name+mode+'.npy', imageData)
+        np.save('./np_data/label_'+Folder_Name+mode+'.npy', labelData)
+        print(len(imageData))
+        print(threshold)
         return train,test    
             
     if channels == 3:
@@ -90,47 +106,60 @@ def Load_Dataset(Folder_Name, mode,channels):
             imageData.append(imgData)
             labelData.append(np.int32(pathAndLabel[1]))
 
-        threshold = np.int32(len(imageData)/8*7)
+        threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
-        print("train={0}".format(threshold))
-        print("test={0}".format(number-threshold))
+        np.save('./np_data/image_'+Folder_Name+mode+'.npy', imageData)
+        np.save('./np_data/label_'+Folder_Name+mode+'.npy', labelData)
+        print(len(imageData))
+        print(threshold)
         return train,test 
            
     
-    if channels == 31:
+    if channels == 21:
         imageData = []
         labelData = []
         for pathAndLabel in allData:
             load_num = load_num + 1
             load_rate = load_rate+1.0
             if load_num%1000 ==0 : print ("load_rate={:.4}%\n\n".format(load_rate/number*100))
-            img11 = np.array(Image.open(pathAndLabel[0]).convert('L') )
-    
-            
+
+            img41 = np.array(Image.open(pathAndLabel[0]).convert('L') )    
+
+
             if int(pathAndLabel[1]) == 0 :
-                path31 =pathAndLabel[0].replace('median11', 'median21')
-                path51 =pathAndLabel[0].replace('median11', 'median41')
+
+                path31 =pathAndLabel[0].replace('median41', 'median21')
+#                   path51 =pathAndLabel[0].replace('median41', 'median41')
             if int(pathAndLabel[1]) == 1 :
-                path31 =pathAndLabel[0].replace('median11', 'median21')
-                path51 =pathAndLabel[0].replace('median11', 'median41')
+
+                path31 =pathAndLabel[0].replace('median41', 'median21')
+#                   path51 =pathAndLabel[0].replace('median41', 'median41')
+
+            img21 =  np.array(Image.open(path31).convert('L') )
+            
+            
+            epsilon = 0.4
+            if epsilon > random():
+
                 
-    #            print(path)
-            img31 =  np.array(Image.open(path31).convert('L') )
-            img51 =  np.array(Image.open(path51).convert('L') )
-            #3チャンネルの画像をr,g,bそれぞれの画像に分ける     
-            grayImgData11 = np.asarray(np.float32(img11)/255.0)
-            grayImgData31 = np.asarray(np.float32(img31)/255.0)
-            grayImgData51 = np.asarray(np.float32(img51)/255.0)
-            imgData = np.asarray([grayImgData11,grayImgData31,grayImgData51])
-            imageData.append(imgData)
-            labelData.append(np.int32(pathAndLabel[1]))        
-        threshold = np.int32(len(imageData)/8*7)
+                #3チャンネルの画像をr,g,bそれぞれの画像に分ける     
+                grayImgData41 = np.asarray(np.float32(img41)/255.0)
+                grayImgData21 = np.asarray(np.float32(img21)/255.0)
+                imgData = np.asarray([grayImgData41,grayImgData21])
+                imageData.append(imgData)
+                labelData.append(np.int32(pathAndLabel[1]))  
+            else:
+                select_rate = select_rate + 1
+        print("Through"+str(select_rate))               
+        np.save('./np_data/image_95-5_'+num+mode+'.npy', imageData)
+        np.save('./np_data/label_95-5_'+num+mode+'.npy', labelData)
+        threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
-        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])        
-    
-        print("train={0}".format(threshold))
-        print("test={0}".format(number-threshold))
+        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
+
+        print(len(imageData))
+        print(threshold)        
         return train,test   
         
         
@@ -161,11 +190,11 @@ def Load_Dataset(Folder_Name, mode,channels):
             imgData = np.asarray([rImgData, gImgData, bImgData,grayImgData])
             imageData.append(imgData)
             labelData.append(np.int32(pathAndLabel[1]))        
-        threshold = np.int32(len(imageData)/1000*999)
+#        threshold = np.int32(len(imageData)/8*7)
+        threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
-        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])        
-        
-        print("train={0}".format(threshold))
-        print("test={0}".format(number-threshold))
+        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
+        print(len(imageData))
+        print(threshold)
         return train,test
     
