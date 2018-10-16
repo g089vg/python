@@ -1,0 +1,177 @@
+# -*- coding: utf-8 -*-
+"""
+Spyderエディタ
+
+これは一時的なスクリプトファイルです
+"""
+import cv2
+import os
+import numpy as np
+def Label(img,out = 1):
+
+
+    # 画像をグレースケールで読み込み
+    gray_src = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+
+
+    # 二値変換
+    # 前処理を使用しなかった場合は、blur_srcではなくgray_srcに書き換えるする
+    mono_src = cv2.threshold(gray_src, 250, 255, cv2.THRESH_BINARY_INV)[1]
+#    cv2.imshow("aaaaaa",mono_src)
+#    cv2.waitKey(500)
+#    cv2.destroyAllWindows()
+    
+    color_src01 = cv2.cvtColor(mono_src, cv2.COLOR_GRAY2BGR)
+
+
+    # ラベリング処理
+    label = cv2.connectedComponentsWithStats(mono_src)
+
+    # オブジェクト情報を項目別に抽出
+    n = label[0] - 1
+    data = np.delete(label[2], 0, 0)
+
+
+    x0,y0,x1,y1 = 0,0,0,0
+    # オブジェクト情報を利用してラベリング結果を画面に表示
+    for i in range(n):
+ 
+        # 各オブジェクトの外接矩形を赤枠で表示
+        x0 = data[i][0]
+        y0 = data[i][1]
+        x1 = data[i][0] + data[i][2]
+        y1 = data[i][1] + data[i][3]
+        
+        cv2.rectangle(color_src01, (x0, y0), (x1, y1), (0, 0, 255))
+
+        # 各オブジェクトのラベル番号と面積に黄文字で表示
+        cv2.putText(color_src01, "ID: " +str(i + 1), (x1 - 20, y1 + 15), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 255))
+        cv2.putText(color_src01, "S: " +str(data[i][4]), (x1 - 20, y1 + 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 255))
+
+    x00 = x0
+    y00 = y0
+    x11 = x1
+    y11 = y1
+    
+    back_g = 0
+
+    
+    while back_g == 0:
+        
+        x = x00
+        back_g1 = 1
+        for y in range(y00,y11):
+            if mono_src[y][x] == 0:
+                back_g1 = 0                
+                break  
+            
+        x = x11
+        back_g2 = 1
+        for y in range(y00,y11):
+#            print(y,x)
+            if mono_src[y][x] == 0:
+                back_g2 = 0
+                break
+            
+        y = y00
+        back_g3 = 1          
+        for x in range(x00,x11):    
+            if mono_src[y][x] == 0:
+                back_g3 = 0
+                break
+        y = y11  
+        back_g4 = 1        
+        for x in range(x00,x11):    
+            if mono_src[y][x] == 0:
+                back_g4 = 0
+                break
+            
+        if back_g1 == 0:
+            x00 = x00+1
+        if back_g2 == 0:
+            x11 = x11-1
+        if back_g3 == 0:
+            y00 = y00+1
+        if back_g4 == 0:
+            y11 = y11-1            
+            
+        if back_g1 == 0 or back_g2 == 0 or back_g3 == 0 or back_g4 == 0:
+            back_g = 0
+        else:
+            back_g = 1
+            
+      # 各オブジェクトの外接矩形を赤枠で表示
+        color_src02 = cv2.cvtColor(mono_src, cv2.COLOR_GRAY2BGR)
+        cv2.rectangle(color_src02, (x00, y00), (x11, y11), (0, 0, 255))
+#        cv2.imshow("color_src02", color_src02)
+#        cv2.waitKey(100)
+#        cv2.destroyAllWindows()
+
+#        cv2.imwrite("../m/a.bmp", color_src02)
+
+
+#        print(back_g)
+    # 結果の表示
+   
+#    print (x0,y0,x1,y1)
+    if out == 0 : return (x00,y00,x11,y11)
+    if out == 1 : return (x0,y0,x1,y1)
+
+if __name__ == "__main__":
+#    data_dir_path1 = u"./input"
+    num = 0
+    file_list1 = os.listdir(r'./input/')
+            
+
+
+    for file_name1 in file_list1:
+        if num >=47:
+            root, ext = os.path.splitext(file_name1)
+            print(file_name1)
+            
+            
+            
+            file_list2 = os.listdir(r'./input/'+file_name1+"/train/")        
+            data_dir_path2 = u"./input/"+file_name1+"/train/"
+            for file_name2 in file_list2:
+                root, ext = os.path.splitext(file_name2)        
+                if ext == u'.bmp':
+                    abs_name = data_dir_path2 + file_name2
+
+                    img = cv2.imread(abs_name,cv2.IMREAD_UNCHANGED)
+                    width,hight,channel = img.shape
+                    if width == 28 and hight == 28 :
+                        print("train-"+file_name2)
+                    else :
+                        x0,y0,x1,y1 = Label(img,0)
+                        dst = img[y0:y1,x0:x1]
+                        cv2.imwrite("../m/output/"+file_name1+"/train/"+file_name2, dst)
+#            dst = img[250:500,0:350]
+#            file_name = file_name[:-10]
+#                print(file_name1,file_name2)
+                
+                    
+            file_list2 = os.listdir(r'./input/'+file_name1+"/test/")        
+            data_dir_path2 = u"./input/"+file_name1+"/test/"
+            for file_name2 in file_list2:
+                root, ext = os.path.splitext(file_name2)   
+                if ext == u'.bmp':
+                        abs_name = data_dir_path2 + file_name2
+                        img = cv2.imread(abs_name,cv2.IMREAD_UNCHANGED)
+                        width,hight,channel = img.shape
+                        if width == 28 and hight == 28 :
+                            print("test-"+file_name2)
+                        else :
+                            x0,y0,x1,y1 = Label(img,0)
+                            dst = img[y0:y1,x0:x1]
+                            cv2.imwrite("../m/output/"+file_name1+"/test/"+file_name2, dst)
+        num = num +1
+
+#                print(file_name1,file_name2)
+                
+#            img = cv2.imread(abs_name,cv2.IMREAD_UNCHANGED)
+#            dst = img[250:500,0:350]
+#            file_name = file_name[:-10]
+#                print(file_name2)
+
