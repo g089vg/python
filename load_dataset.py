@@ -56,6 +56,7 @@ def Load_Dataset(Folder_Name, mode,channels, num):
         print("Load numpy Data")
         imageData = np.load('./np_data/image_'+Folder_Name+mode+'.npy')
         labelData = np.load('./np_data/label_'+Folder_Name+mode+'.npy')
+        threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
         print(len(imageData))
@@ -83,8 +84,8 @@ def Load_Dataset(Folder_Name, mode,channels, num):
         threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
-        np.save('./np_data/image_'+Folder_Name+mode+'.npy', imageData)
-        np.save('./np_data/label_'+Folder_Name+mode+'.npy', labelData)
+        np.save('./np_data/image_95-5_'+num+mode+'.npy', imageData)
+        np.save('./np_data/label_95-5_'+num+mode+'.npy', labelData)
         print(len(imageData))
         print(threshold)
         return train,test    
@@ -109,8 +110,8 @@ def Load_Dataset(Folder_Name, mode,channels, num):
         threshold = len(imageData) -100 
         train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
         test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
-        np.save('./np_data/image_'+Folder_Name+mode+'.npy', imageData)
-        np.save('./np_data/label_'+Folder_Name+mode+'.npy', labelData)
+        np.save('./np_data/image_95-5_'+num+mode+'.npy', imageData)
+        np.save('./np_data/label_95-5_'+num+mode+'.npy', labelData)
         print(len(imageData))
         print(threshold)
         return train,test 
@@ -198,3 +199,23 @@ def Load_Dataset(Folder_Name, mode,channels, num):
         print(threshold)
         return train,test
     
+    if channels == 5: #チャンネル数が1つの場合
+        imageData = []
+        labelData = []
+        for pathAndLabel in allData:
+            load_num = load_num + 1
+            load_rate = load_rate+1.0
+            if load_num%1000 ==0 : print ("load_rate={:.4}%\n\n".format(load_rate/number*100))
+#            print(pathAndLabel[0])
+
+            if int(pathAndLabel[1]) == 1 :
+                img = np.array(Image.open(pathAndLabel[0]).convert('L') )
+                grayImgData = np.asarray(np.float32(img)/255.0)
+                imgData = np.asarray([grayImgData])
+                imageData.append(imgData)
+                labelData.append(np.int32(pathAndLabel[1]))
+
+            
+
+        train = tuple_dataset.TupleDataset(imageData)
+        return imageData     
