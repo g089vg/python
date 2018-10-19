@@ -13,7 +13,13 @@ import os
 from random import random as rand
 from PIL import Image
 
-
+def Delete_File (top = '削除したいディレクトリ'):     
+  for root, dirs, files in os.walk(top, topdown=False):
+      for name in files:
+          os.remove(os.path.join(root, name))
+      for name in dirs:
+          os.rmdir(os.path.join(root, name))
+          
 
 def transform(img,center):
 #画像サイズの取得
@@ -83,7 +89,7 @@ if __name__ == '__main__':
     h = 50
     w = 50
     color = 10
-    thin = 2
+    thin = 1
     size = (h,w)
     img1 = np.full(size, 255, dtype=np.uint8)
     img2 = np.full(size, 255, dtype=np.uint8)
@@ -94,7 +100,7 @@ if __name__ == '__main__':
     img3 = cv2.line(img3, (25, 0), (25, 50), color, thickness=thin, lineType=cv2.LINE_AA)
     img4 = cv2.line(img4, (0, 25), (50, 25), color, thickness=thin, lineType=cv2.LINE_AA)
 
-
+    Delete_File("./data/generate_image/")
     file_list = os.listdir(r"./data/NO_CRACK_DATA/")
     mode = "rgb"
     channels = 0
@@ -154,10 +160,7 @@ if __name__ == '__main__':
 #            blur3 = cv2.GaussianBlur(transform(img3,center3),(7,7),0) 
 #            blur4 = cv2.GaussianBlur(transform(img4,center4),(7,7),0) 
 
-            s1 = Label(blur1) 
-            s2 = Label(blur2) 
-            s3 = Label(blur3) 
-            s4 = Label(blur4) 
+
 
             blur1 = cv2.threshold(blur1, 100, 255, cv2.THRESH_BINARY)[1]
             blur2 = cv2.threshold(blur2, 100, 255, cv2.THRESH_BINARY)[1]
@@ -168,6 +171,7 @@ if __name__ == '__main__':
             plt.imshow(im_list)
             #表示
             plt.show()
+            
 
 
 #            print(s1,s2,s3,s4)
@@ -177,25 +181,31 @@ if __name__ == '__main__':
             out3 = np.full(size, 255, dtype=np.uint8)
             out4 = np.full(size, 255, dtype=np.uint8)
         
-#            length = random.randint(5, 15)
-#            epsilon = 0.5
-#            if epsilon > rand():   
-#                for yy in range(length,h-length):
-#                    for xx in range(length,w-length):
-#                        out1[yy][xx] = blur1[yy][xx]
-#                        out2[yy][xx] = blur2[yy][xx]
-#                        out3[yy][xx] = blur3[yy][xx]
-#                        out4[yy][xx] = blur4[yy][xx]
-#            else:
-#                out1 = blur1
-#                out2 = blur2
-#                out3 = blur3
-#                out4 = blur4
-            out1 = blur1
-            out2 = blur2
-            out3 = blur3
-            out4 = blur4           
-            color = ave -30
+            length = random.randint(5, 10)
+            epsilon = 0.5
+            if epsilon > rand():   
+                for yy in range(length,h-length):
+                    for xx in range(length,w-length):
+                        out1[yy][xx] = blur1[yy][xx]
+                        out2[yy][xx] = blur2[yy][xx]
+                        out3[yy][xx] = blur3[yy][xx]
+                        out4[yy][xx] = blur4[yy][xx]
+            else:
+                out1 = blur1
+                out2 = blur2
+                out3 = blur3
+                out4 = blur4
+                
+                
+            s1 = Label(blur1) 
+            s2 = Label(blur2) 
+            s3 = Label(blur3) 
+            s4 = Label(blur4) 
+#            out1 = blur1
+#            out2 = blur2
+#            out3 = blur3
+#            out4 = blur4           
+            color = ave -80
             if(color < 0):color =10             
             for y in range(h):
                 for x in range(w):
@@ -221,8 +231,8 @@ if __name__ == '__main__':
             inp3 = cv2.GaussianBlur(inp3,(3,3),0) 
             inp4 = cv2.GaussianBlur(inp4,(3,3),0) 
             
-            if s1 >= 100 and s1<=400:cv2.imwrite("./data/generate_image/"+file_name+"_1.bmp", inp1)
-            if s2 >= 100 and s2<=400:cv2.imwrite("./data/generate_image/"+file_name+"_2.bmp", inp2)
-            if s3 >= 100 and s3<=400:cv2.imwrite("./data/generate_image/"+file_name+"_3.bmp", inp3)
-            if s4 >= 100 and s4<=400:cv2.imwrite("./data/generate_image/"+file_name+"_4.bmp", inp4)
+            if s1 >= 10 and s1<=400:cv2.imwrite("./data/generate_image/"+file_name+"_1.bmp", inp1)
+            if s2 >= 10 and s2<=400:cv2.imwrite("./data/generate_image/"+file_name+"_2.bmp", inp2)
+            if s3 >= 10 and s3<=400:cv2.imwrite("./data/generate_image/"+file_name+"_3.bmp", inp3)
+            if s4 >= 10 and s4<=400:cv2.imwrite("./data/generate_image/"+file_name+"_4.bmp", inp4)
             num = num +1
