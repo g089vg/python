@@ -210,7 +210,7 @@ if __name__ == '__main__':
             for y in range(h):
                 for x in range(w):
                     
-                    if(out1[y][x] == 0):
+                    if(out1[y][x] != 0):
                         inp1[y][x][0] = color
                         inp1[y][x][1] = color
                         inp1[y][x][2] = color
@@ -226,10 +226,10 @@ if __name__ == '__main__':
                         inp4[y][x][0] = color
                         inp4[y][x][1] = color
                         inp4[y][x][2] = color
-            inp1 = cv2.GaussianBlur(inp1,(3,3),0) 
-            inp2 = cv2.GaussianBlur(inp2,(3,3),0) 
-            inp3 = cv2.GaussianBlur(inp3,(3,3),0) 
-            inp4 = cv2.GaussianBlur(inp4,(3,3),0) 
+            inp1 = cv2.GaussianBlur(inp1,(7,7),0) 
+            inp2 = cv2.GaussianBlur(inp2,(7,7),0) 
+            inp3 = cv2.GaussianBlur(inp3,(7,7),0) 
+            inp4 = cv2.GaussianBlur(inp4,(7,7),0) 
             
             if s1 >= 10 and s1<=400:cv2.imwrite("./data/generate_image/"+file_name+"_1.bmp", inp1)
             if s2 >= 10 and s2<=400:cv2.imwrite("./data/generate_image/"+file_name+"_2.bmp", inp2)
