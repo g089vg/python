@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 08:42:50 2018
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 13:03:27 2018
-
-@author: mitani
-"""
 
 # -*- coding: utf-8 -*-
 """
