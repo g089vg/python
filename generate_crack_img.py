@@ -12,7 +12,9 @@ import random
 import os
 from random import random as rand
 from PIL import Image
-
+from Zhang_Suen import Zhang_Suen_thinning
+from Zhang_Suen import Draw_Line
+#import Zhang_Suen
 def Delete_File (top = '削除したいディレクトリ'):     
   for root, dirs, files in os.walk(top, topdown=False):
       for name in files:
@@ -31,7 +33,7 @@ def transform(img,center):
     
     #水滴の中心と半径の指定
 
-    r = 40
+    r = random.randint(20, 40)
     
     #ピクセルの座標を変換
     for x in range(width):
@@ -52,10 +54,10 @@ def transform(img,center):
     return(img2)
 
 def Label(img):
-    
-
+    img1=np.asarray(img)
+#    print(img.type)
     # ラベリング処理
-    mono_src = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY_INV)[1]
+    mono_src = cv2.threshold(img1, 200, 255, cv2.THRESH_BINARY_INV)[1]
     
     
 #    im_list = np.asarray(mono_src)
@@ -91,148 +93,126 @@ if __name__ == '__main__':
     color = 10
     thin = 1
     size = (h,w)
-    img1 = np.full(size, 255, dtype=np.uint8)
-    img2 = np.full(size, 255, dtype=np.uint8)
-    img3 = np.full(size, 255, dtype=np.uint8)
-    img4 = np.full(size, 255, dtype=np.uint8)   
-    img1 = cv2.line(img1, (0, 0), (50, 50), color, thickness=thin, lineType=cv2.LINE_AA)
-    img2 = cv2.line(img2, (0, 50), (50, 0), color, thickness=thin, lineType=cv2.LINE_AA)
-    img3 = cv2.line(img3, (25, 0), (25, 50), color, thickness=thin, lineType=cv2.LINE_AA)
-    img4 = cv2.line(img4, (0, 25), (50, 25), color, thickness=thin, lineType=cv2.LINE_AA)
+    
+    create_image = 6   
+    img_line = []
+    img_ = np.full(size, 255, dtype=np.uint8)
+    img_line = Draw_Line(img_,0,1)
+#    img.append([img_])
 
-    Delete_File("./data/generate_image/")
+    Delete_File("./data/generate_image1/")
+    Delete_File("./data/generate_image2/")
+
     file_list = os.listdir(r"./data/NO_CRACK_DATA/")
     mode = "rgb"
     channels = 0
-    num = 0.0
+    number = 0.0
+    
+    
     for file_name in file_list:
         root, ext = os.path.splitext(file_name)
         if ext == u'.bmp':
-            rate = float(num/2871.0)
-            print("load_rate={:.4}%\n\n".format(rate*100))
-            inp1 = cv2.imread("./data/NO_CRACK_DATA/"+file_name)
-            inp2 = cv2.imread("./data/NO_CRACK_DATA/"+file_name)
-            inp3 = cv2.imread("./data/NO_CRACK_DATA/"+file_name)
-            inp4 = cv2.imread("./data/NO_CRACK_DATA/"+file_name)
+
+            
+            inp = []
+            for num in range (create_image):
+                inp.append(cv2.imread("./data/NO_CRACK_DATA/"+file_name))
+
 
             ave1 = 0.0
             ave2 = 0.0
             ave3 = 0.0
             for y in range (h) :
                 for x in range( w) :
-                    ave1  = inp1[y][x][0] + ave1
-                    ave2  = inp1[y][x][1] + ave2
-                    ave3  = inp1[y][x][2] + ave3
+                    ave1  = inp[0][y][x][0] + ave1
+                    ave2  = inp[0][y][x][1] + ave2
+                    ave3  = inp[0][y][x][2] + ave3
             ave1  = ave1 / float(h*w)
             ave2  = ave2 / float(h*w)
             ave3  = ave3 / float(h*w)   
             ave = (ave1+ave2+ave3)/3.0
-            print(ave)
+            print("average={:.4}\n\n".format(ave))
             file_name = file_name[:-4]
             
-            T = 0
-            while T == 0:
-                center1 = random.randint(0, 49),random.randint(0, 49)
-                if img1[center1] == 255: 
-                    T = 1
-            T = 0
-            while T == 0:
-                center2 = random.randint(0, 49),random.randint(0, 49)
-                if img2[center2] == 255: 
-                    T = 1
-            T = 0
-            while T == 0:
-                center3 = random.randint(0, 49),random.randint(0, 49)
-                if img3[center3] == 255: 
-                    T = 1
-            T = 0
-            while T == 0:
-                center4 = random.randint(0, 49),random.randint(0, 49)
-                if img4[center4] == 255: 
-                    T = 1
-            blur1 = transform(img1,center1)
-            blur2 = transform(img2,center2) 
-            blur3 = transform(img3,center3)
-            blur4 = transform(img4,center4)            
+
+            trm = []
+            blur = []
+            center_ = 0
+            for num in range (create_image):
+                T = 0
+                while T == 0:
+                    center_ = (random.randint(0, 49),random.randint(0, 49))
+#                    print(center_) 
+
+                    if img_line[num][center_[0]][center_[1]] == 255: 
+                        T = 1
+
+                trm.append(transform(img_line[num],center_))
+                blur.append(cv2.threshold(trm[num], 150, 255, cv2.THRESH_BINARY)[1])
             
-#            blur1 = cv2.GaussianBlur(transform(img1,center1),(7,7),0) 
-#            blur2 = cv2.GaussianBlur(transform(img2,center2),(7,7),0) 
-#            blur3 = cv2.GaussianBlur(transform(img3,center3),(7,7),0) 
-#            blur4 = cv2.GaussianBlur(transform(img4,center4),(7,7),0) 
+
+        
+            length = random.randint(1, 10)
+            print(length)
+            epsilon = 0.5
+            if epsilon > rand():   
+                for num in range (create_image):
+                    
+                    for yy in range(h):
+                        for xx in range(w):
+                            if(xx<length or xx > w-length or yy < length or yy > h-length):
+                                blur[num][yy][xx] = 255
+                            else:
+                                blur[num][yy][xx] = blur[num][yy][xx]
+
+                
+#            ラベリングで面積を取得  
+            s = []
+            out = []
+            for num in range (create_image):       
+                s.append(Label(blur[num]))   
+                epsilon = 0.7
+                if epsilon > rand():                  
+                    out.append(blur[num])
+                else:
+                    out.append(Zhang_Suen_thinning(blur[num]))
 
 
-
-            blur1 = cv2.threshold(blur1, 100, 255, cv2.THRESH_BINARY)[1]
-            blur2 = cv2.threshold(blur2, 100, 255, cv2.THRESH_BINARY)[1]
-            blur3 = cv2.threshold(blur3, 100, 255, cv2.THRESH_BINARY)[1]
-            blur4 = cv2.threshold(blur4, 100, 255, cv2.THRESH_BINARY)[1]
-            im_list = np.asarray(blur1)
+            
+            im_list = np.asarray(out[0])
             #貼り付け
             plt.imshow(im_list)
             #表示
             plt.show()
+            print("S="+str(s[0]))
+            rate = rand()
+            epsilon = 0.7
             
-
-
-#            print(s1,s2,s3,s4)
+            color1 = ave -80
+            if(color1 < 0):color1 =10
+            if(ave < 20):color1 =50  
             
-            out1 = np.full(size, 255, dtype=np.uint8)
-            out2 = np.full(size, 255, dtype=np.uint8)
-            out3 = np.full(size, 255, dtype=np.uint8)
-            out4 = np.full(size, 255, dtype=np.uint8)
-        
-            length = random.randint(5, 10)
-            epsilon = 0.5
-            if epsilon > rand():   
-                for yy in range(length,h-length):
-                    for xx in range(length,w-length):
-                        out1[yy][xx] = blur1[yy][xx]
-                        out2[yy][xx] = blur2[yy][xx]
-                        out3[yy][xx] = blur3[yy][xx]
-                        out4[yy][xx] = blur4[yy][xx]
-            else:
-                out1 = blur1
-                out2 = blur2
-                out3 = blur3
-                out4 = blur4
+            color2 = ave + 150
+            if(color2 > 255):color2 =255
+            if(ave > 140):color2 =10 
+            
+            
+            for num in range (create_image):   
                 
-                
-            s1 = Label(blur1) 
-            s2 = Label(blur2) 
-            s3 = Label(blur3) 
-            s4 = Label(blur4) 
-#            out1 = blur1
-#            out2 = blur2
-#            out3 = blur3
-#            out4 = blur4           
-            color = ave -80
-            if(color < 0):color =10             
-            for y in range(h):
-                for x in range(w):
-                    
-                    if(out1[y][x] != 0):
-                        inp1[y][x][0] = color
-                        inp1[y][x][1] = color
-                        inp1[y][x][2] = color
-                    if(out2[y][x] == 0):                        
-                        inp2[y][x][0] = color
-                        inp2[y][x][1] = color
-                        inp2[y][x][2] = color
-                    if(out3[y][x] == 0):                        
-                        inp3[y][x][0] = color
-                        inp3[y][x][1] = color
-                        inp3[y][x][2] = color
-                    if(out4[y][x] == 0):                        
-                        inp4[y][x][0] = color
-                        inp4[y][x][1] = color
-                        inp4[y][x][2] = color
-            inp1 = cv2.GaussianBlur(inp1,(7,7),0) 
-            inp2 = cv2.GaussianBlur(inp2,(7,7),0) 
-            inp3 = cv2.GaussianBlur(inp3,(7,7),0) 
-            inp4 = cv2.GaussianBlur(inp4,(7,7),0) 
-            
-            if s1 >= 10 and s1<=400:cv2.imwrite("./data/generate_image/"+file_name+"_1.bmp", inp1)
-            if s2 >= 10 and s2<=400:cv2.imwrite("./data/generate_image/"+file_name+"_2.bmp", inp2)
-            if s3 >= 10 and s3<=400:cv2.imwrite("./data/generate_image/"+file_name+"_3.bmp", inp3)
-            if s4 >= 10 and s4<=400:cv2.imwrite("./data/generate_image/"+file_name+"_4.bmp", inp4)
-            num = num +1
+                for y in range(h):
+                    for x in range(w):
+                        
+                        if(out[num][y][x] == 0):
+    
+                            if epsilon > rate:   
+                                inp[num][y][x] = color1
+
+                            else: 
+                                inp[num][y][x] = color2
+
+            for num in range (create_image):     
+                      
+                inp[num] = cv2.GaussianBlur(inp[num],(5,5),0)             
+                if s[num] >= 10 and s[num]<=400:cv2.imwrite("./data/generate_image1/"+file_name+"_"+str(num)+".bmp", inp[num])
+
+            number = number +1
