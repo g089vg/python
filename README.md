@@ -37,7 +37,5 @@ if  show [rejected]→git pull
    * ssh-keygen -t rsa -C "Your mail address"   
    * ls -l  
    * less id_rsa.pub  
-
-
-
+   * clip < ~/.ssh/id_rsa.pub (Windows)  
 
