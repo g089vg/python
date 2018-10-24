@@ -44,7 +44,18 @@ def Load_Dataset(Folder_Name, mode,channels, num):
                 imagelist = glob.glob(path + "*")
                 for imgName in imagelist:
                     allData.append([imgName, label])
-            
+  
+    #merge segmantaion data                
+    pathsAndLabels2 = []                   
+    pathsAndLabels2.append(np.asarray(["./data/gen_median41_1/", 1]))    
+    for pathAndLabel2 in pathsAndLabels2:
+        path2 = pathAndLabel2[0]
+        label2 = pathAndLabel2[1]
+        imagelist2 = glob.glob(path2 + "*")
+        a = 0
+        for imgName2 in imagelist2:
+            allData.append([imgName2, label2])
+
     allData = np.random.permutation(allData)
 
     number = len(allData)  
