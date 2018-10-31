@@ -94,14 +94,16 @@ if __name__ == '__main__':
     thin = 1
     size = (h,w)
     
-    create_image = 6   
+    create_image = 6 
     img_line = []
     img_ = np.full(size, 255, dtype=np.uint8)
     img_line = Draw_Line(img_,0,1)
+    
+    cv2.imwrite("./data/generate_image2/a.bmp", img_line[1])
 #    img.append([img_])
 
-    Delete_File("./data/generate_image1/")
-    Delete_File("./data/generate_image2/")
+#    Delete_File("./data/generate_image1/")
+#    Delete_File("./data/generate_image2/")
 
     file_list = os.listdir(r"./data/NO_CRACK_DATA/")
     mode = "rgb"
@@ -150,6 +152,7 @@ if __name__ == '__main__':
                 trm.append(transform(img_line[num],center_))
                 blur.append(cv2.threshold(trm[num], 150, 255, cv2.THRESH_BINARY)[1])
             
+            cv2.imwrite("./data/generate_image2/b.bmp", blur[1])
 
         
             length = random.randint(1, 10)
@@ -209,10 +212,12 @@ if __name__ == '__main__':
 
                             else: 
                                 inp[num][y][x] = color2
+            cv2.imwrite("./data/generate_image2/d.bmp", inp[1])
 
             for num in range (create_image):     
                       
                 inp[num] = cv2.GaussianBlur(inp[num],(5,5),0)             
                 if s[num] >= 10 and s[num]<=400:cv2.imwrite("./data/generate_image1/"+file_name+"_"+str(num)+".bmp", inp[num])
+            cv2.imwrite("./data/generate_image2/e.bmp", inp[1])
 
             number = number +1
