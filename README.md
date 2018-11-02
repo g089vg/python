@@ -36,7 +36,7 @@ if  show [rejected]→git pull
    * cd ~/.ssh  
    * ssh-keygen -t rsa -C "Your mail address"   
    * ls -l  
-   * less id_rsa.pub  
+   * (less id_rsa.pub)←Add  
    * clip < ~/.ssh/id_rsa.pub (Windows)  
 * Connection from repository to github  
    * git remote add origin "your repository SSH sddress"  
