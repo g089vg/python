@@ -39,4 +39,4 @@ if  show [rejected]→git pull
    * (less id_rsa.pub)←Add  
    * clip < ~/.ssh/id_rsa.pub (Windows)  
 * Connection from repository to github  
-   * git remote add origin "your repository SSH sddress"  
+   * git remote add origin "your repository SSH address"  
