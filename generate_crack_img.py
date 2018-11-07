@@ -53,36 +53,46 @@ def transform(img,center):
                 img2[y,x]=img[p[0],p[1]]
     return(img2)
 
-def Label(img):
+def Label(img,threshold):
     img1=np.asarray(img)
-#    print(img.type)
-    # ラベリング処理
-    mono_src = cv2.threshold(img1, 200, 255, cv2.THRESH_BINARY_INV)[1]
+    height,width = img1.shape[0],img1.shape[1]
+    mono_src = cv2.threshold(img1, 128, 255, cv2.THRESH_BINARY_INV)[1]
+    crack = 0
+    for y in range(height):
+        for x in range(width):
+            if mono_src[y][x] == 255:
+             crack = crack + 1   
+ 
     
     
-#    im_list = np.asarray(mono_src)
-#    #貼り付け
-#    plt.imshow(im_list)
-#    #表示
-#    plt.show()   
-    
-    ret, markers = cv2.connectedComponents(mono_src)
-    label = cv2.connectedComponentsWithStats(mono_src)  
-    
-    
-    # ラベリング結果書き出し準備
-    height, width = mono_src.shape[:2]
-    n = label[0] - 1
-    data = np.delete(label[2], 0, 0)
-    s_max = 0
+##    print(img.type)
+#    # ラベリング処理
+#    mono_src = cv2.threshold(img1, 200, 255, cv2.THRESH_BINARY_INV)[1]
+#    
+#    
+##    im_list = np.asarray(mono_src)
+##    #貼り付け
+##    plt.imshow(im_list)
+##    #表示
+##    plt.show()   
+#    
+#    ret, markers = cv2.connectedComponents(mono_src)
+#    label = cv2.connectedComponentsWithStats(mono_src)  
+#    
+#    
+#    # ラベリング結果書き出し準備
+#    height, width = mono_src.shape[:2]
+#    n = label[0] - 1
+#    data = np.delete(label[2], 0, 0)
+#    s_max = 0
+#
+#    for i in range(n): 
+##        print(data[i][4])
+#
+#        if s_max < data[i][4]  :
+#            s_max = data[i][4]
 
-    for i in range(n): 
-#        print(data[i][4])
-
-        if s_max < data[i][4]  :
-            s_max = data[i][4]
-
-    return(s_max)
+    return(crack)
 
 
 if __name__ == '__main__':
@@ -94,33 +104,32 @@ if __name__ == '__main__':
     thin = 1
     size = (h,w)
     
-    create_image = 6 
-    img_line = []
-    img_ = np.full(size, 255, dtype=np.uint8)
-    img_line = Draw_Line(img_,0,1)
-    
-    cv2.imwrite("./data/generate_image2/a.bmp", img_line[1])
+    create_image =3
+
 #    img.append([img_])
 
-#    Delete_File("./data/generate_image1/")
+    Delete_File("./data/generate_image1/")
 #    Delete_File("./data/generate_image2/")
 
     file_list = os.listdir(r"./data/NO_CRACK_DATA/")
     mode = "rgb"
     channels = 0
-    number = 0.0
+    number = 0
     
     
     for file_name in file_list:
         root, ext = os.path.splitext(file_name)
-        if ext == u'.bmp':
-
+        if ext == u'.bmp'and number >= 0:
+            
+            default_color = 255
+            img_ = np.full(size, default_color, dtype=np.uint8) 
+            img_line = Draw_Line(img_,(0,0,0),1)
+            cv2.imwrite("./data/generate_image2/a.bmp", img_line[1])
             
             inp = []
             for num in range (create_image):
                 inp.append(cv2.imread("./data/NO_CRACK_DATA/"+file_name))
-
-
+      
             ave1 = 0.0
             ave2 = 0.0
             ave3 = 0.0
@@ -133,30 +142,43 @@ if __name__ == '__main__':
             ave2  = ave2 / float(h*w)
             ave3  = ave3 / float(h*w)   
             ave = (ave1+ave2+ave3)/3.0
+            
+            img_ = np.full((50,50,3), (ave1,ave2,ave3), dtype=np.uint8) 
+            img_line_color = Draw_Line(img_,(0,0,0),1)     
+            cv2.imwrite("./data/generate_image2/aa.bmp", img_line_color[1])            
+            
+            
             print("average={:.4}\n\n".format(ave))
             file_name = file_name[:-4]
             
-
             trm = []
+            trm_color = []
             blur = []
+            blur_color = []
             center_ = 0
+
+            #ランダムに画像を変形
             for num in range (create_image):
                 T = 0
                 while T == 0:
                     center_ = (random.randint(0, 49),random.randint(0, 49))
 #                    print(center_) 
-
-                    if img_line[num][center_[0]][center_[1]] == 255: 
+                    
+                    if img_line[num][center_[0]][center_[1]] != 0 : 
                         T = 1
 
                 trm.append(transform(img_line[num],center_))
-                blur.append(cv2.threshold(trm[num], 150, 255, cv2.THRESH_BINARY)[1])
+                trm_color.append(transform(img_line_color[num],center_))
+
+                blur.append(cv2.GaussianBlur(trm[num],(5,5),0))
+                blur_color.append(cv2.GaussianBlur(trm_color[num],(5,5),0))
             
             cv2.imwrite("./data/generate_image2/b.bmp", blur[1])
+            cv2.imwrite("./data/generate_image2/bb.bmp", blur_color[1])
 
-        
+            
+            #ひび割れ領域を縮小
             length = random.randint(1, 10)
-            print(length)
             epsilon = 0.5
             if epsilon > rand():   
                 for num in range (create_image):
@@ -164,60 +186,60 @@ if __name__ == '__main__':
                     for yy in range(h):
                         for xx in range(w):
                             if(xx<length or xx > w-length or yy < length or yy > h-length):
-                                blur[num][yy][xx] = 255
+                                blur[num][yy][xx] = default_color
                             else:
                                 blur[num][yy][xx] = blur[num][yy][xx]
+         
 
-                
+
+
+             
 #            ラベリングで面積を取得  
             s = []
             out = []
             for num in range (create_image):       
-                s.append(Label(blur[num]))   
-                epsilon = 0.7
-                if epsilon > rand():                  
-                    out.append(blur[num])
-                else:
-                    out.append(Zhang_Suen_thinning(blur[num]))
+                s.append(Label(blur[num],200))
+                print(s[num])
+#                epsilon = 0.7
+#                if epsilon > rand():                  
+#                    out.append(blur[num])
+#                else:
+#                    out.append(Zhang_Suen_thinning(blur[num]))
+
+            
+
 
 
             
-            im_list = np.asarray(out[0])
+            im_list = np.asarray(blur[1])
             #貼り付け
             plt.imshow(im_list)
             #表示
             plt.show()
-            print("S="+str(s[0]))
-            rate = rand()
-            epsilon = 0.7
+#            print("S="+str(s[0]))
             
-            color1 = ave -80
-            if(color1 < 0):color1 =10
-            if(ave < 20):color1 =50  
-            
-            color2 = ave + 150
-            if(color2 > 255):color2 =255
-            if(ave > 140):color2 =10 
-            
+
+      
             
             for num in range (create_image):   
                 
                 for y in range(h):
                     for x in range(w):
                         
-                        if(out[num][y][x] == 0):
-    
-                            if epsilon > rate:   
-                                inp[num][y][x] = color1
+                        if(blur[num][y][x] != 255):                             
+                             inp[num][y][x] = blur_color[num][y][x]
+                             epsilon = 0.15
+                             if epsilon > rand():   
+                                 r = (random.randint(0, 49),random.randint(0, 49))
+#                                 color = int(255*r),int(255*r),int(255*r)
+                                 inp[num][y][x] = inp[num][r[0]][r[1]]                            
 
-                            else: 
-                                inp[num][y][x] = color2
-            cv2.imwrite("./data/generate_image2/d.bmp", inp[1])
+            cv2.imwrite("./data/generate_image2/e.bmp", inp[1])
 
             for num in range (create_image):     
                       
-                inp[num] = cv2.GaussianBlur(inp[num],(5,5),0)             
+#                inp[num] = cv2.GaussianBlur(inp[num],(5,5),0)             
                 if s[num] >= 10 and s[num]<=400:cv2.imwrite("./data/generate_image1/"+file_name+"_"+str(num)+".bmp", inp[num])
-            cv2.imwrite("./data/generate_image2/e.bmp", inp[1])
+#            cv2.imwrite("./data/generate_image2/i.bmp", inp[1])
 
-            number = number +1
+        number = number +1
