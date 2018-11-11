@@ -15,7 +15,16 @@ name = 1
 name = (str)(name)
 
 
+def addGaussianNoise(src):
+    row,col,ch= src.shape
+    mean = 0
+    var = 0.1
+    sigma = 20
+    gauss = np.random.normal(mean,sigma,(row,col,ch))
+    gauss = gauss.reshape(row,col,ch)
+    noisy = src + gauss
 
+    return noisy
 
 def Delete_File (top = '削除したいディレクトリ'):     
   for root, dirs, files in os.walk(top, topdown=False):
@@ -229,3 +238,92 @@ for file_name in file_list:
 
 #                   56
 
+                        gussian = cv2.GaussianBlur(img,(3,3),0)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_0_0.bmp",gussian)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_0_90.bmp",Translation(gussian,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_0_180.bmp",Translation(gussian,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_0_270.bmp",Translation(gussian,270))    
+                        gussian_flip = cv2.flip(gussian, 1)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_1_0.bmp",gussian_flip)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_1_90.bmp",Translation(gussian_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_1_180.bmp",Translation(gussian_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_1_270.bmp",Translation(gussian_flip,270))
+                        
+                    #           64
+                    
+                    
+                    
+                        gussian_gamma1 = cv2.GaussianBlur(gamma_img1,(3,3),0)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_0_0.bmp",gussian_gamma1)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_0_90.bmp",Translation(gussian_gamma1,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_0_180.bmp",Translation(gussian_gamma1,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_0_270.bmp",Translation(gussian_gamma1,270))    
+                        gussian_gamma1_flip = cv2.flip(gussian_gamma1, 1)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_1_0.bmp",gussian_gamma1_flip)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_1_90.bmp",Translation(gussian_gamma1_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_1_180.bmp",Translation(gussian_gamma1_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma1_1_270.bmp",Translation(gussian_gamma1_flip,270))
+                #               72
+                    
+                        gussian_gamma2 = cv2.GaussianBlur(gamma_img2,(3,3),0)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_0_0.bmp",gussian_gamma2)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_0_90.bmp",Translation(gussian_gamma2,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_0_180.bmp",Translation(gussian_gamma2,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_0_270.bmp",Translation(gussian_gamma2,270))    
+                        gussian_gamma2_flip = cv2.flip(gussian_gamma2, 1)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_1_0.bmp",gussian_gamma2_flip)
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_1_90.bmp",Translation(gussian_gamma2_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_1_180.bmp",Translation(gussian_gamma2_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_gussian_gamma2_1_270.bmp",Translation(gussian_gamma2_flip,270))
+                #               80
+                        
+                        noise = addGaussianNoise(img)
+                        cv2.imwrite(outputname2+file_name2+"_noise_0_0.bmp",noise)
+                        cv2.imwrite(outputname2+file_name2+"_noise_0_90.bmp",Translation(noise,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_0_180.bmp",Translation(noise,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_0_270.bmp",Translation(noise,270))    
+                        noise_flip = cv2.flip(noise, 1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_1_0.bmp",noise_flip)
+                        cv2.imwrite(outputname2+file_name2+"_noise_1_90.bmp",Translation(noise_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_1_180.bmp",Translation(noise_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_1_270.bmp",Translation(noise_flip,270))        
+                #               88
+                        
+                        noise_gamma1 = addGaussianNoise(gamma_img1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_0_0.bmp",noise_gamma1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_0_90.bmp",Translation(noise_gamma1,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_0_180.bmp",Translation(noise_gamma1,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_0_270.bmp",Translation(noise_gamma1,270))    
+                        noise_gamma1_flip = cv2.flip(noise_gamma1, 1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_1_0.bmp",noise_gamma1_flip)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_1_90.bmp",Translation(noise_gamma1_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_1_180.bmp",Translation(noise_gamma1_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma1_1_270.bmp",Translation(noise_gamma1_flip,270))
+                        
+                #               96       
+                        
+                        noise_gamma2 = addGaussianNoise(gamma_img2)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_0_0.bmp",noise_gamma1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_0_90.bmp",Translation(noise_gamma1,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_0_180.bmp",Translation(noise_gamma1,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_0_270.bmp",Translation(noise_gamma1,270))    
+                        noise_gamma2_flip = cv2.flip(noise_gamma2, 1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_1_0.bmp",noise_gamma2_flip)
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_1_90.bmp",Translation(noise_gamma2_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_1_180.bmp",Translation(noise_gamma2_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_gamma2_1_270.bmp",Translation(noise_gamma2_flip,270))       
+                        
+                 #               104       
+                 
+                        noise_hc = addGaussianNoise(high_cont_img)
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_0_0.bmp",noise_hc)
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_0_90.bmp",Translation(noise_hc,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_0_180.bmp",Translation(noise_hc,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_0_270.bmp",Translation(noise_hc,270))    
+                        noise_hc_flip = cv2.flip(noise_hc, 1)
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_1_0.bmp",noise_hc_flip)
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_1_90.bmp",Translation(noise_hc_flip,90))
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_1_180.bmp",Translation(noise_hc_flip,180))
+                        cv2.imwrite(outputname2+file_name2+"_noise_hc_1_270.bmp",Translation(noise_hc_flip,270))       
+                
+                 #               112         
