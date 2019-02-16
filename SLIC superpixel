@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 16 12:02:13 2019
+
+@author: g089v
+"""
+
+import matplotlib.pyplot as plt
+import skimage.data
+import skimage.color
+import skimage.filters
+import skimage.util
+import skimage.segmentation
+from sklearn.cluster import KMeans
+import os
+import cv2
+import numpy as np
+
+
+def SLIC_superpixel(src_img,superpixel_num = 100,compactness = 10):
+    height,width,ch = src_img.shape
+    
+    superpixel1_img =src_img
+    superpixel2_img =src_img
+    a = skimage.segmentation.slic(src_img,superpixel_num,compactness)
+    num = np.amax(a)+1
+    superpixel = np.zeros((num,4), np.float) 
+    superpixel_ave =  np.zeros((num,3), np.float)
+    for y in range(height) :
+        for x in range(width) :
+            superpixel[a[y][x]][0] += src_img[y][x][0]
+            superpixel[a[y][x]][1] += src_img[y][x][1]
+            superpixel[a[y][x]][2] += src_img[y][x][2]
+            superpixel[a[y][x]][3] += 1
+            
+    for i in range(num): 
+        superpixel_ave[i][0] = superpixel[i][0] / superpixel[i][3]
+        superpixel_ave[i][1] = superpixel[i][1] / superpixel[i][3]
+        superpixel_ave[i][2] = superpixel[i][2] / superpixel[i][3]
+        
+    recognition,recognition_ave= recognition_superpixel(superpixel_ave,num)
+    
+    
+    
+    for y in range(height) :
+        for x in range(width) :
+             superpixel1_img[y][x][0] = superpixel_ave[a[y][x]][0]
+             superpixel1_img[y][x][1] = superpixel_ave[a[y][x]][1]
+             superpixel1_img[y][x][2] = superpixel_ave[a[y][x]][2]
+             
+    for y in range(height) :
+        for x in range(width) :
+             superpixel2_img[y][x][0] = recognition_ave[recognition[a[y][x]]][0]
+             superpixel2_img[y][x][1] = recognition_ave[recognition[a[y][x]]][1]
+             superpixel2_img[y][x][2] = recognition_ave[recognition[a[y][x]]][2]
+             
+             
+    return(superpixel1_img,superpixel2_img)
+    
+def  recognition_superpixel(superpixel1,num):
+    
+    
+    k_class = 3
+    recognition = KMeans(n_clusters=k_class).fit_predict(superpixel1)
+    superpixel2 = np.zeros((k_class,4), np.float)
+    superpixel2_ave = np.zeros((k_class,3), np.float)
+    for i in range(num):     
+       superpixel2[recognition[i]][0] += superpixel1[i][0]
+       superpixel2[recognition[i]][1] += superpixel1[i][1]
+       superpixel2[recognition[i]][2] += superpixel1[i][2]
+       superpixel2[recognition[i]][3] += 1
+       
+    for i in range(k_class): 
+        superpixel2_ave[i][0] = superpixel2[i][0] / superpixel2[i][3]
+        superpixel2_ave[i][1] = superpixel2[i][1] / superpixel2[i][3]
+        superpixel2_ave[i][2] = superpixel2[i][2] / superpixel2[i][3]       
+      
+       
+    return(recognition,superpixel2_ave)
+#    print(superpixel2)
+if __name__ == "__main__":
+    
+    data_dir_path = u"./data/2.5m_half/"
+    file_list = os.listdir(r'./data/2.5m_half/')
+    nnum = 0
+    for file_name in file_list:
+        root, ext = os.path.splitext(file_name)
+        if ext == u'.bmp':
+            nnum += 1
+            print(file_name)
+            abs_name1 = data_dir_path + '/' + file_name
+            
+    
+            src_img = cv2.imread(abs_name1)
+            dst_img1,dst_img2 = SLIC_superpixel(src_img,800,50)
+            
+            
+
+            cv2.imwrite("./data/superpixel/"+file_name, dst_img2)   
