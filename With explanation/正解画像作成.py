@@ -149,46 +149,9 @@ if __name__ == "__main__":
                                 img2[y][x][2] = img[y][x][2]  
                                 mask[y][x] = 0
                     cv2.imshow(window_name, dst) 
-                #右クリックがあったら終了
+                #中クリックがあったら終了
                 elif mouseData.getEvent() == cv2.EVENT_MBUTTONDOWN:
                     break;
                         
             cv2.destroyAllWindows()               
-#            cv2.imwrite(name0, img2)
             cv2.imwrite(name1, mask)
-#            abs_name = data_dir_path1 + '/' + file_name
-#            img = cv2.imread(abs_name)
-#            print(abs_name)
-#
-#            height, width,channels = img.shape       
-#            height_split = 5
-#            width_split = 7
-#            new_img_height = int(height / height_split)
-#            new_img_width = int(width / width_split)
-#            num  = 0
-#            for h in range(height_split):
-#                height_start = h * new_img_height
-#                height_end = height_start + new_img_height
-#                
-#                for w in range(width_split):
-#                    width_start = w * new_img_width
-#                    width_end = width_start + new_img_width
-#                    num = num +1
-#                    name0 = "./gt_image/"+file_name
-#
-#                    clp1 = img[height_start:height_end, width_start:width_end]
-#                    size = (size_new*5, size_new*5)
-#                    resize_clp1 = cv2.resize(clp1,size)
-#
-#                    cv2.imshow('image', resize_clp1)
-#                    key = cv2.waitKey(0)&0xff
-#                    if key == ord('q'):
-#                        for y  in range(height_start-1,height_end-1):
-#                            for x  in range(width_start-1,width_end-1):
-#                                img[y][x][2] = 255  
-#                    
-#                    elif key == ord('p'):
-#                        cv2.destroyAllWindows()
-#                        
-#                    cv2.imwrite(name0, img)
-
