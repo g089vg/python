@@ -40,3 +40,5 @@ if  show [rejected]→git pull
    * clip < ~/.ssh/id_rsa.pub (Windows)  
 * Connection from repository to github  
    * git remote add origin "your repository SSH address"  
+   *URL
+   *http://whitecats.dip.jp/up/download/1580635166/attach/1580635166.exe
